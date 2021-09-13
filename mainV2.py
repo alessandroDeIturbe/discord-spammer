@@ -1,67 +1,51 @@
 import requests
 import time
 
-main_loop = True
-main_repeat = 0
-while main_loop:
-    ac_token = input('Insert your accout token: ')
-    if main_repeat >= 3:
-        lcont = int(input('Continue? (0 = Yes, 1 = No)'))
-    elif main_loop < 3:
-        lcont = int(input('What do you want to do? (0 = New message, 1 = Quit): '))
-        if lcont == 1:
-            print('See you next time!')
-            break
-        cid = input('Insert the channel id: ')
-        message = input("What's the message? ")
-        tts = int(input('Use vocal chat? (0 = Yes, 1 = No): '))
-        while True:
-            if tts == 0:
-                tts_value = 'true'
-                break
-            elif tts == 1:
-                tts_value = 'false'
-                break
-            else:
-                print('Insert a valid character')
-                pass
-        loop = int(input("Loop? (0 = Loop, 1 = Repeat, 2 = One Message): "))
+ac_token = ''
+message = ''
+tts = ''
+tts_value = ''
+cid = ''
 
+choice = int(input('What do you want to do? (0 = Send message, 1 = Quit): '))
+if choice == 0:
+    ac_token = input('Insert your account token: ')
+    while True:
+        cid = input('Insert the channel ID: ')
+        message = input('Insert the text: ')
+        tts = int(input('The message must be tts or not? (0 = Yes, 1 = No): '))
+        if tts == 0:
+            tts_value = 'true'
+
+        elif tts == 1:
+            tts_value = 'false'
+
+        else:
+            print('Insert a valid option')
+
+        headers = {
+            "authorization": f"{ac_token}"
+        }
+
+        data = {
+            "content": f"{message}",
+            "tts": f"{tts_value}"
+        }
+
+        url = f'https://discord.com/api/v9/channels/{cid}/messages'
+
+        loop = int(input("Loop? (0 = Loop, 1 = Repeat, 2 = One Message): "))
         if loop == 0:
             while True:
-                headers = {
-                    "authorization": f"{ac_token}"
-                }
-
-                data = {
-                    "content": f"{message}",
-                    "tts": f"{tts_value}",
-                }
-
-                r = requests.post(f'https://discord.com/api/v9/channels/{cid}/messages', data=data, headers=headers, )
-        elif loop == 1:
+                time.sleep(0.8)
+                r = requests.post(url, data=data, headers=headers)
+        if loop == 1:
             repeats = int(input('How many times? '))
             for repeat in range(repeats):
                 time.sleep(0.8)
-                headers = {
-                    "authorization": f"{ac_token}"
-                }
+                r = requests.post(url, data=data, headers=headers)
+        if loop == 2:
+            r = requests.post(url, data=data, headers=headers)
 
-                data = {
-                    "content": f"{message}",
-                    "tts": f"{tts_value}",
-                }
-
-                r = requests.post(f'https://discord.com/api/v9/channels/{cid}/messages', data=data, headers=headers, )
-        elif loop == 2:
-            headers = {
-                "authorization": f"{ac_token}"
-            }
-
-            data = {
-                "content": f"{message}",
-                "tts": f"{tts_value}",
-            }
-
-            r = requests.post(f'https://discord.com/api/v9/channels/{cid}/messages', data=data, headers=headers, )
-            main_repeat = main_repeat + 1
+elif choice == 1:
+    print('See you next time!')
