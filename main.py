@@ -1,15 +1,36 @@
+import os
 import requests
 import time
 
 ac_token = ''
 message = ''
-tts = ''
+tts = 1
 tts_value = ''
 cid = ''
 
 choice = int(input('What do you want to do? (0 = Send message, 1 = Quit): '))
 if choice == 0:
-    ac_token = input('Insert your account token: ')
+    if os.path.exists('token.key'):
+        with open('token.key', 'r') as file:
+            ac_token = file.read()
+            
+        if ac_token == '':
+            print('Invalid token in token.key')
+            exit(1)
+        
+        print('TOKEN: {}'.format(ac_token))
+           
+    else:
+        ac_token = input('Insert your account token: ')
+        print('Is better to store your token in a \'token.key\' file. Create it?')
+        create = input('[y]/n: ')
+        if create.lower() == 'y' or create == '':
+            with open('token.key', 'w') as file:
+                file.write(ac_token)
+
+        else:
+            pass
+        
     while True:
         cid = input('Insert the channel ID: ')
         message = input('Insert the text: ')
